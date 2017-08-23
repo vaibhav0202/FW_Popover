@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <FW_Popover>
+            <version>1.0.0</version>
+        </FW_Popover>
+    </modules>
+    <global>
+        <models>
+            <popover>
+                <class>FW_Popover_Model</class>
+            </popover>
+        </models>
+        <helpers>
+            <popover>
+                <class>FW_Popover_Helper</class>
+            </popover>
+        </helpers>
+        <blocks>
+            <popover>
+                <class>FW_Popover_Block</class>
+            </popover>
+        </blocks>
+        <events>
+            <controller_action_layout_generate_blocks_after>
+                <observers>
+                    <popover>
+                        <class>FW_Popover_Model_Observer</class>
+                        <method>checkUser</method>
+                    </popover>
+                </observers>
+            </controller_action_layout_generate_blocks_after>
+        </events>
+    </global>
+</config>

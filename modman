@@ -1,0 +1,4 @@
+app/code/local/FW/Popover/ app/code/local/FW/Popover/
+app/etc/modules/FW_Popover.xml  app/etc/modules/FW_Popover.xml
+app/design/frontend/base/default/template/fw/ app/design/frontend/base/default/template/fw/
+app/design/frontend/fw/default/template/fw/ app/design/frontend/fw/default/template/fw/

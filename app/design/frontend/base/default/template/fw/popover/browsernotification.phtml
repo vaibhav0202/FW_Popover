@@ -1,0 +1,139 @@
+<?php
+//Get config variables and cms block HTML
+$storeId = Mage::app()->getStore()->getId();
+$browserVersions = Mage::helper('popover')->getBrowserVersionConfig($storeId);
+$cmsBlock = $this->getLayout()->createBlock('cms/block')->setBlockId('browser_notification')->toHtml();
+?>
+
+<script type="text/javascript">
+    var $browsernotification = function (op) {
+        var n = window.navigator;
+        this.op = op || {};
+        this.op.vsreqs = {
+            i: <?php echo $browserVersions['internet_explorer'] ?>,
+            f: <?php echo $browserVersions['firefox'] ?>,
+            o: <?php echo $browserVersions['opera'] ?>,
+            s: <?php echo $browserVersions['safari'] ?>,
+            c: <?php echo $browserVersions['chrome'] ?>,
+            n: 12
+        };
+
+        function getBrowser(ua_str) {
+            var n, t, ua = ua_str || navigator.userAgent;
+            var names = {
+                i: 'Internet Explorer',
+                f: 'Firefox',
+                o: 'Opera',
+                s: 'Apple Safari',
+                n: 'Netscape Navigator',
+                c: "Chrome",
+                x: "Other"
+            };
+            if (/bot|googlebot|facebook|slurp|wii|silk|blackberry|maxthon|maxton|mediapartners|dolfin|dolphin|adsbot|silk|android|phone|bingbot|google web preview|like firefox|chromeframe|seamonkey|opera mini|min|meego|netfront|moblin|maemo|arora|camino|flot|k-meleon|fennec|kazehakase|galeon|android|mobile|iphone|ipod|ipad|epiphany|konqueror|rekonq|symbian|webos|coolnovo|blackberry|bb10|RIM|PlayBook|PaleMoon|QupZilla|YaBrowser|Otter|Midori|qutebrowser/i.test(ua))n = "x";
+            else if (/Trident.*rv:(\d+\.\d+)/i.test(ua))n = "i";
+            else if (/Trident.(\d+\.\d+)/i.test(ua))n = "io";
+            else if (/MSIE.(\d+\.\d+)/i.test(ua))n = "i";
+            else if (/Edge.(\d+)/i.test(ua))n = "i";
+            else if (/OPR.(\d+\.\d+)/i.test(ua))n = "o";
+            else if (/Chrome.(\d+\.\d+)/i.test(ua))n = "c";
+            else if (/Firefox.(\d+\.\d+)/i.test(ua))n = "f";
+            else if (/Version.(\d+.\d+).{0,10}Safari/i.test(ua))n = "s";
+            else if (/Safari.(\d+)/i.test(ua))n = "so";
+            else if (/Opera.*Version.(\d+\.\d+)/i.test(ua))n = "o";
+            else if (/Opera.(\d+\.?\d+)/i.test(ua))n = "o";
+            else if (/Netscape.(\d+)/i.test(ua))n = "n";
+            else return {
+                n: "x",
+                v: 0,
+                t: names[n]
+            };
+            var v = parseFloat(RegExp.$1);
+            var donotnotify = false;
+            if (/windows.nt.5.0|windows.nt.4.0|windows.98|os x 10.4|os x 10.5|os x 10.3|os x 10.2/.test(ua))donotnotify = "oldOS";
+            if (n == "f" && (Math.round(v) == 31 || Math.round(v) == 38 || Math.round(v) == 45))
+                donotnotify = "ESR";
+            if (n == "x")return {n: "x", v: v || 0, t: names[n], donotnotify: donotnotify};
+            if (n == "so") {
+                v = ((v < 100) && 1.0) || ((v < 130) && 1.2) || ((v < 320) && 1.3) || ((v < 520) && 2.0) || ((v < 524) && 3.0) || ((v < 526) && 3.2) || 4.0;
+                n = "s";
+            }
+            if (n == "i" && v == 7 && window.XDomainRequest) {
+                v = 8;
+            }
+            if (n == "io") {
+                n = "i";
+                if (v > 6)v = 11; else if (v > 5)v = 10; else if (v > 4)v = 9; else if (v > 3.1)v = 8; else if (v > 3)v = 7; else v = 9;
+            }
+            return {n: n, v: v, t: names[n] + " " + v, donotnotify: donotnotify};
+        }
+
+        function isBrowserOutOfDate(browserN, browserV, browserReqs) {
+            var version = browserV;
+            var req = browserReqs[browserN];
+
+            if (req == null) {
+                return false;
+            } else if (version <= req) {
+                //Browser is out of date
+                return true;
+            }
+        }
+
+        //Get Browser Version
+        this.op.browser = getBrowser();
+
+        //If Browser is out of date
+        if (isBrowserOutOfDate(this.op.browser.n, this.op.browser.v, this.op.vsreqs)) {
+            var t = 'Oops! Your browser <b>(' + this.op.browser.t + ')</b> is out of date! <?php echo $cmsBlock; ?>';
+            var div = document.createElement("div");
+            this.op.div = div;
+            div.id = "bnotif";
+            div.className = "bnotif";
+            div.innerHTML = '<div>' + t + '<div id="bnotifclose">&times;</div></div>';
+            var sheet = document.createElement("style");
+            var style = ".bnotif { position:absolute; position:fixed; z-index:111111;\
+                                width:100%; top:0px; left:0px;\
+                                background-color: #FF7A4D;\
+                                text-align:center;\
+                                font-family: Arial,Helvetica,sans-serif;\
+                                color:#FFF; font-size: 15px; font-weight: bold; }\
+                        .bnotif div { padding:5px 36px 5px 40px; }\
+                        .bnotif a,.bnotif a:visited  {color:#FFF; text-decoration: underline;}\
+                        #bnotifclose { display: none; position: absolute; right: 6px; top: 0; height: 20px; width: 12px;\
+                                font-weight: bold;font-size:18px; padding:0; cursor: pointer; }";
+            document.body.insertBefore(div, document.body.firstChild);
+            document.getElementsByTagName("head")[0].appendChild(sheet);
+            try {
+                sheet.innerText = style;
+                sheet.innerHTML = style;
+            }
+            catch (e) {
+                try {
+                    sheet.styleSheet.cssText = style;
+                }
+                catch (e) {
+                    return;
+                }
+            }
+            var me = this;
+            var hm = document.getElementsByTagName("html")[0] || document.body;
+            this.op.bodymt = hm.style.marginTop;
+            hm.style.marginTop = (div.clientHeight) + "px";
+            (function (me) {
+                document.getElementById("bnotifclose").onclick = function (e) {
+                    var e = e || window.event;
+                    if (e.stopPropagation) e.stopPropagation();
+                    else e.cancelBubble = true;
+                    me.op.div.style.display = "none";
+                    hm.style.marginTop = me.op.bodymt;
+                    me.op.onclose(me.op);
+                    //setCookie(me.op.reminderClosed);
+                    return true;
+                };
+            })(me);
+        }
+    };
+
+    var $bnotif = $bnotif || {};
+    $bu = $browsernotification($bnotif);
+</script>
